@@ -70,8 +70,8 @@ footer{background:#0a2a21;color:#b9c9c0;padding:56px 0 24px;font-size:.92rem}foo
 <script>
 document.querySelector('.burger').onclick=function(){var n=document.querySelector('nav');var o=n.classList.toggle('open');this.setAttribute('aria-expanded',o)};
 var EXT=['jpg','jpeg','png','webp','gif','JPG','JPEG','PNG','mp4','mov','webm','m4v','MP4','MOV'],VID=/^(mp4|mov|webm|m4v)$/i,LBL={schooloutreach:'School outreach',medicaloutreach:'Medical outreach',medicaloutreachvideo:'Medical outreach video'},cache={};
-function probe(base){return new Promise(function(res){var k=0;(function next(){if(k>=EXT.length)return res(null);var e=EXT[k++],src=base+'.'+e,v=VID.test(e),el=document.createElement(v?'video':'img');el.onerror=next;
- if(v){el.preload='metadata';el.muted=true;el.onloadedmetadata=function(){res({src:src,video:true})}}else{el.onload=function(){res({src:src,video:false})}}el.src=src})()})}
+function probe(base){return new Promise(function(res){var k=0;(function next(){if(k>=EXT.length)return res(null);var e=EXT[k++],src=base+'.'+e,v=VID.test(e),el=document.createElement(v?'video':'img'),done=false,fin=function(r){if(done)return;done=true;res(r)};el.onerror=function(){if(done)return;done=true;next()};
+ if(v){el.preload='metadata';el.muted=true;el.onloadedmetadata=function(){fin({src:src,video:true})};setTimeout(function(){fin({src:src,video:true})},6000)}else{el.onload=function(){fin({src:src,video:false})}}el.src=src})()})}
 function series(spec){if(cache[spec])return cache[spec];var p=spec.split(':'),b=p[0],m=+p[1]||10;
  return cache[spec]=new Promise(function(res){var out=[],miss=0,n=1;(function step(){if(n>m||miss>=3)return res(out);var i=n++;probe(b+i).then(function(r){if(r){miss=0;r.cap=LBL[b]+' '+i;r.b=b;out.push(r)}else miss++;step()})})()})}
 function fig(r){var f=document.createElement('figure'),m;f.className='slide'+(r.video?' v':'');
